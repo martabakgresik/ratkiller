@@ -1,0 +1,12 @@
+name = "ratkiller"
+pages_build_output_dir = "dist"
+compatibility_date = "2024-03-20"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "ratkiller-db"
+database_id = "c7f40b9d-4e4a-41a9-910a-b3e357389afd"
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "ratkiller-media"
