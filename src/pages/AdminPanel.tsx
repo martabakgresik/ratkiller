@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Save, AlertCircle, ArrowLeft, Loader2, Image as ImageIcon } from 'lucide-react';
+import { Save, AlertCircle, ArrowLeft, Loader2, Image as ImageIcon, Lock } from 'lucide-react';
 import { AppConfig } from '../App';
 import { Link } from 'react-router-dom';
 
@@ -22,6 +22,19 @@ export default function AdminPanel({ config: initialConfig }: { config: AppConfi
   
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [passwordInput, setPasswordInput] = useState("");
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    const correctPassword = import.meta.env.VITE_ADMIN_PASSWORD || "admin123";
+    if (passwordInput === correctPassword) {
+      setIsAuthenticated(true);
+    } else {
+      alert("Password salah!");
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
@@ -84,6 +97,36 @@ export default function AdminPanel({ config: initialConfig }: { config: AppConfi
         setUploading(false);
      }
   };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6 font-sans">
+        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 max-w-sm w-full">
+          <div className="flex justify-center mb-6">
+            <div className="bg-blue-100 p-3 rounded-full text-blue-600">
+              <Lock className="w-8 h-8" />
+            </div>
+          </div>
+          <h2 className="text-2xl font-bold text-center mb-6 text-gray-900">Login Admin</h2>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+              <input
+                type="password"
+                value={passwordInput}
+                onChange={(e) => setPasswordInput(e.target.value)}
+                placeholder="Masukkan password..."
+                className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none"
+              />
+            </div>
+            <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg font-semibold transition-colors">
+              Masuk
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-6 md:p-12 font-sans text-gray-900">
