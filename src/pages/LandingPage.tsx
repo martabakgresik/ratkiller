@@ -392,9 +392,20 @@ export default function LandingPage({ config, isLoading }: { config: AppConfig |
               </div>
             )}
 
-            <div className="bg-black/5 p-4 rounded-2xl border border-black/10 text-sm flex items-start gap-3">
+            <div className="bg-black/5 p-4 rounded-2xl border border-black/10 text-sm flex items-start gap-3 mb-6">
               <AlertTriangle className="w-6 h-6 text-yellow-500 shrink-0 mt-0.5" />
               <p className={`leading-relaxed ${theme.textMuted}`}>Simpan di tempat yang sejuk & kering. Jauhkan dari sinar matahari secara langsung. Cuci tangan setelah memakai.</p>
+            </div>
+
+            {/* COD / Trust Feature */}
+            <div className="bg-black/5 p-4 rounded-2xl border border-black/10 flex items-center gap-4">
+              <div className={`${theme.iconBg} p-3 rounded-full shrink-0`}>
+                <Truck className={`w-6 h-6 ${theme.iconColor}`} />
+              </div>
+              <div>
+                <p className={`font-bold text-base md:text-lg mb-0.5 ${theme.textNormal}`}>Bisa COD (Bayar di Tempat)</p>
+                <p className={`text-sm leading-snug ${theme.textMuted}`}>Belanja lebih aman, bayar tunai ke kurir saat barang sampai.</p>
+              </div>
             </div>
           </motion.div>
 
