@@ -295,7 +295,7 @@ export default function LandingPage({ config, isLoading }: { config: AppConfig |
           )}
 
           {/* Subheadline */}
-          <h2 className="text-2xl md:text-4xl font-bold text-center mb-10 max-w-2xl leading-snug drop-shadow-md text-white">
+          <h2 className={`text-2xl md:text-4xl font-bold text-center mb-10 max-w-2xl leading-snug drop-shadow-md ${theme.textNormal}`}>
             {config?.subheadline ? (
               <span dangerouslySetInnerHTML={{ __html: config.subheadline.replace('\n', '<br/>') }} />
             ) : (
