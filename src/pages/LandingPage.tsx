@@ -283,7 +283,21 @@ export default function LandingPage({ config, isLoading }: { config: AppConfig |
             />
           ) : (
             <h1 className={`text-5xl md:text-7xl font-black tracking-tighter mb-4 flex justify-center items-center gap-1 drop-shadow-lg ${theme.textNormal}`}>
-              {config?.headline || "RatKiller"}
+              {(() => {
+                const text = config?.headline || "RatKiller";
+                const index = text.toLowerCase().indexOf('t');
+                if (index === -1) return text;
+                return (
+                  <>
+                    {text.slice(0, index)}
+                    <span className="text-red-500 relative inline-block">
+                      {text[index]}
+                      <CheckCircle2 className="absolute -top-6 md:-top-8 left-1/2 transform -translate-x-1/2 w-6 h-6 md:w-8 md:h-8 text-red-500 bg-white rounded-full shadow-sm" />
+                    </span>
+                    {text.slice(index + 1)}
+                  </>
+                );
+              })()}
             </h1>
           )}
 
