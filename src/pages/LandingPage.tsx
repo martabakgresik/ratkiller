@@ -178,10 +178,10 @@ export default function LandingPage({ config, isLoading }: { config: AppConfig |
   const waMessage = config?.waMessage || "Halo Admin, saya tertarik untuk membeli RatKiller.";
   const waLink = `https://wa.me/${waNumber}?text=${encodeURIComponent(waMessage)}`;
 
-  const featuresListRaw = config?.featuresList || "Tikus Rumah\nTikus Semak\nTikus Got\nTikus Sawah";
+  const featuresListRaw = config?.featuresList || "Tikus Rumah\nTikus Semak\nTikus Got\nTikus Sawah\nAman bagi hewan ternak atau peliharaan karena produk ini sudah diuji khusus";
   const features = featuresListRaw.split('\n').map(f => f.trim()).filter(f => f);
 
-  const bonusItemsRaw = config?.bonusItems || "Kaos Tangan Plastik|Keamanan ekstra saat menyebar umpan.\nTempat Umpan|Wadah khusus agar area tetap bersih.";
+  const bonusItemsRaw = config?.bonusItems || "Kaos Tangan Plastik|Keamanan ekstra saat menyebar umpan.\nTempat Umpan|Wadah khusus agar area tetap bersih.\nMasker Pelindung|Melindungi pernapasan Anda saat menebar umpan.\nPanduan Penggunaan|Tips rahasia mencegah tikus kembali lagi.";
   const bonusItems = bonusItemsRaw.split('\n').map(b => b.trim()).filter(b => b);
 
   const heroImagePosition = config?.heroImagePosition || "top";
