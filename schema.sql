@@ -6,18 +6,27 @@ CREATE TABLE IF NOT EXISTS config_table (
   subheadline TEXT,
   maintenance BOOLEAN DEFAULT 0,
   price TEXT,
+  weight TEXT,
   waMessage TEXT,
   promoBadge TEXT,
   heroImage TEXT,
   footerText TEXT,
   footerYear TEXT,
   featuresList TEXT,
+  bonusItems TEXT,
   heroImagePosition TEXT,
-  themeColor TEXT
+  themeColor TEXT,
+  maintenanceReason TEXT,
+  maintenanceContact TEXT,
+  maintenanceUntil TEXT,
+  headerType TEXT,
+  logoUrl TEXT,
+  logoWidth INTEGER,
+  logoHeight INTEGER
 );
 
 -- Insert default configuration
-INSERT INTO config_table (waNumber, headline, subheadline, maintenance, price, waMessage, promoBadge, heroImage, footerText, footerYear, featuresList, heroImagePosition, themeColor)
+INSERT INTO config_table (waNumber, headline, subheadline, maintenance, price, weight, waMessage, promoBadge, heroImage, footerText, footerYear, featuresList, bonusItems, heroImagePosition, themeColor, maintenanceReason, maintenanceContact, maintenanceUntil, headerType, logoUrl, logoWidth, logoHeight)
 VALUES (
   '6281234567890',
   'RatKiller',

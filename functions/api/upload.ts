@@ -1,6 +1,20 @@
+import { extractToken, verifyToken } from '../utils/jwt';
+
 export async function onRequestPost(context: any) {
   try {
     const { request, env } = context;
+    
+    // Auth check
+    const token = extractToken(request);
+    if (!token) {
+      return new Response(JSON.stringify({ error: "Unauthorized: Missing token" }), { status: 401, headers: { "Content-Type": "application/json" }});
+    }
+    
+    const decoded = await verifyToken(token, env.JWT_SECRET);
+    if (!decoded) {
+      return new Response(JSON.stringify({ error: "Unauthorized: Invalid token" }), { status: 401, headers: { "Content-Type": "application/json" }});
+    }
+
     const formData = await request.formData();
     const file = formData.get("image");
 
@@ -15,9 +29,8 @@ export async function onRequestPost(context: any) {
       httpMetadata: { contentType: file.type }
     });
 
-    // Get public URL from env or fallback
-    const publicUrl = env.R2_PUBLIC_URL || "https://your-r2-public-url.r2.dev";
-    const fileUrl = `${publicUrl}/${filename}`;
+    // Return the local API path to serve the file directly
+    const fileUrl = `/api/media/${filename}`;
     
     return Response.json({ url: fileUrl });
   } catch (error) {

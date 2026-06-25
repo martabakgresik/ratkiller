@@ -12,7 +12,7 @@ import {
   Share2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { AppConfig } from '../App';
 
 const faqs = [
@@ -33,6 +33,58 @@ const faqs = [
     answer: "Pastikan selalu menjauhkan dari jangkauan anak-anak dan hewan peliharaan. Letakkan umpan di tempat yang tersembunyi dan gunakan wadah umpan agar lebih aman."
   }
 ];
+
+function MaintenanceCountdown({ targetDate }: { targetDate: string }) {
+  const [timeLeft, setTimeLeft] = useState<{days: number, hours: number, minutes: number, seconds: number} | null>(null);
+
+  useEffect(() => {
+    if (!targetDate) return;
+    const target = new Date(targetDate).getTime();
+    
+    const interval = setInterval(() => {
+      const now = new Date().getTime();
+      const distance = target - now;
+
+      if (distance < 0) {
+        clearInterval(interval);
+        setTimeLeft(null);
+        return;
+      }
+
+      setTimeLeft({
+        days: Math.floor(distance / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+        minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
+        seconds: Math.floor((distance % (1000 * 60)) / 1000)
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [targetDate]);
+
+  if (!targetDate || !timeLeft) return null;
+
+  return (
+    <div className="flex flex-wrap gap-3 justify-center my-8">
+      <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-4 w-24 shadow-inner">
+        <div className="text-3xl font-bold text-yellow-500">{timeLeft.days}</div>
+        <div className="text-xs font-semibold text-neutral-400 mt-1 uppercase tracking-wider">Hari</div>
+      </div>
+      <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-4 w-24 shadow-inner">
+        <div className="text-3xl font-bold text-yellow-500">{timeLeft.hours}</div>
+        <div className="text-xs font-semibold text-neutral-400 mt-1 uppercase tracking-wider">Jam</div>
+      </div>
+      <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-4 w-24 shadow-inner">
+        <div className="text-3xl font-bold text-yellow-500">{timeLeft.minutes}</div>
+        <div className="text-xs font-semibold text-neutral-400 mt-1 uppercase tracking-wider">Menit</div>
+      </div>
+      <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-4 w-24 shadow-inner">
+        <div className="text-3xl font-bold text-yellow-500">{timeLeft.seconds}</div>
+        <div className="text-xs font-semibold text-neutral-400 mt-1 uppercase tracking-wider">Detik</div>
+      </div>
+    </div>
+  );
+}
 
 export default function LandingPage({ config, isLoading }: { config: AppConfig | null, isLoading?: boolean }) {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
@@ -97,8 +149,27 @@ export default function LandingPage({ config, isLoading }: { config: AppConfig |
     return (
       <div className="min-h-screen bg-neutral-950 flex flex-col items-center justify-center text-white px-4 text-center">
         <AlertTriangle className="w-16 h-16 text-yellow-500 mb-6" />
-        <h1 className="text-3xl font-bold mb-2">Website Sedang Dalam Perbaikan</h1>
-        <p className="text-gray-400">Kami sedang melakukan pembaruan sistem. Silakan kembali lagi nanti.</p>
+        <h1 className="text-3xl font-bold mb-4">Website Sedang Dalam Perbaikan</h1>
+        <p className="text-gray-400 mb-2 max-w-lg mx-auto leading-relaxed">
+          {config.maintenanceReason || "Kami sedang melakukan pembaruan sistem. Silakan kembali lagi nanti."}
+        </p>
+        
+        {config.maintenanceUntil && <MaintenanceCountdown targetDate={config.maintenanceUntil} />}
+        
+        {config.maintenanceContact && (
+          <div className="mt-8 flex flex-col items-center gap-4">
+            <p className="text-sm font-medium text-neutral-400">Butuh bantuan darurat?</p>
+            <a 
+              href={`https://wa.me/${config.maintenanceContact}`} 
+              target="_blank" 
+              rel="noreferrer"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 rounded-full font-semibold text-white transition-all shadow-sm"
+            >
+              <MessageCircle className="w-5 h-5 text-green-500" />
+              Chat WhatsApp Admin
+            </a>
+          </div>
+        )}
       </div>
     );
   }
@@ -109,6 +180,9 @@ export default function LandingPage({ config, isLoading }: { config: AppConfig |
 
   const featuresListRaw = config?.featuresList || "Tikus Rumah\nTikus Semak\nTikus Got\nTikus Sawah";
   const features = featuresListRaw.split('\n').map(f => f.trim()).filter(f => f);
+
+  const bonusItemsRaw = config?.bonusItems || "Kaos Tangan Plastik|Keamanan ekstra saat menyebar umpan.\nTempat Umpan|Wadah khusus agar area tetap bersih.";
+  const bonusItems = bonusItemsRaw.split('\n').map(b => b.trim()).filter(b => b);
 
   const heroImagePosition = config?.heroImagePosition || "top";
 
@@ -163,9 +237,9 @@ export default function LandingPage({ config, isLoading }: { config: AppConfig |
     <div className={`min-h-screen ${theme.bg} font-sans relative pb-28 ${theme.selection}`}>
       {/* Background Texture Overlay */}
       <div 
-        className="absolute inset-0 opacity-10 pointer-events-none"
+        className="absolute inset-0 opacity-20 pointer-events-none"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='42' height='44' viewBox='0 0 42 44' xmlns='http://www.w3.org/2000/svg'%3E%3Cg id='Page-1' fill='none' fill-rule='evenodd'%3E%3Cg id='brick-wall' fill='%23000000' fill-opacity='0.4'%3E%3Cpath d='M0 0h42v44H0V0zm1 1h40v20H1V1zM0 23h20v20H0V23zm22 0h20v20H22V23z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='42' height='44' viewBox='0 0 42 44' xmlns='http://www.w3.org/2000/svg'%3E%3Cg id='Page-1' fill='none' fill-rule='evenodd'%3E%3Cg id='brick-wall' fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M0 0h42v44H0V0zm1 1h40v20H1V1zM0 23h20v20H0V23zm22 0h20v20H22V23z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
         }}
       ></div>
       
@@ -181,7 +255,7 @@ export default function LandingPage({ config, isLoading }: { config: AppConfig |
           {/* Share Button */}
           <button 
             onClick={handleShare}
-            className={`absolute right-0 top-0 md:right-4 md:top-4 p-2.5 ${theme.textMuted} hover:${theme.textNormal} bg-black/10 hover:bg-black/20 backdrop-blur-sm rounded-full border border-black/10 transition-all shadow-sm z-20`}
+            className={`absolute right-0 top-0 md:right-4 md:top-4 p-2.5 ${theme.iconColor} ${theme.iconBg} hover:opacity-80 backdrop-blur-md rounded-full border border-white/10 shadow-lg transition-all z-20`}
             aria-label="Bagikan"
           >
             <Share2 className="w-5 h-5" />
@@ -200,20 +274,28 @@ export default function LandingPage({ config, isLoading }: { config: AppConfig |
             </AnimatePresence>
           </button>
 
-          {/* Logo */}
-          <h1 className="text-4xl md:text-6xl font-black tracking-tighter mb-8 flex items-center gap-1 drop-shadow-lg">
-            {config?.headline || "RatKiller"}
-          </h1>
+          {config?.headerType === 'logo' && config?.logoUrl ? (
+            <img 
+              src={config.logoUrl} 
+              alt={config.headline} 
+              style={{ width: `${config.logoWidth}px`, height: `${config.logoHeight}px` }} 
+              className="object-contain mb-6 drop-shadow-xl" 
+            />
+          ) : (
+            <h1 className={`text-5xl md:text-7xl font-black tracking-tighter mb-4 flex justify-center items-center gap-1 drop-shadow-lg ${theme.textNormal}`}>
+              {config?.headline || "RatKiller"}
+            </h1>
+          )}
 
           {/* Headline Badge */}
           {config?.promoBadge && (
-            <div className={`${theme.badgeBg} font-black text-5xl md:text-7xl px-10 py-3 uppercase tracking-wider mb-8 transform -skew-x-6 border`}>
-              <span className="transform skew-x-6 block">{config.promoBadge}</span>
+            <div className="bg-red-600 text-white font-black text-5xl md:text-7xl px-12 py-3 uppercase tracking-widest mb-6 border-b-4 border-red-700 shadow-xl">
+              {config.promoBadge}
             </div>
           )}
 
           {/* Subheadline */}
-          <h2 className="text-2xl md:text-4xl font-bold text-center mb-10 max-w-2xl leading-snug drop-shadow-md">
+          <h2 className="text-2xl md:text-4xl font-bold text-center mb-10 max-w-2xl leading-snug drop-shadow-md text-white">
             {config?.subheadline ? (
               <span dangerouslySetInnerHTML={{ __html: config.subheadline.replace('\n', '<br/>') }} />
             ) : (
@@ -267,7 +349,7 @@ export default function LandingPage({ config, isLoading }: { config: AppConfig |
           >
             {/* Weight Badge */}
             <div className={`${theme.badgeBg} absolute top-0 right-0 text-sm md:text-base font-black px-4 py-2 rounded-bl-2xl shadow-lg border-b border-l z-10`}>
-              {config?.price || "250 GRAM"}
+              {config?.weight || "250 GRAM"}
             </div>
 
             {/* Hero Image (Left Position) */}
@@ -302,6 +384,14 @@ export default function LandingPage({ config, isLoading }: { config: AppConfig |
               </>
             )}
 
+            {/* Price Display */}
+            {config?.price && (
+              <div className="mb-6 bg-red-600/10 border-2 border-red-500 rounded-2xl p-4 text-center shadow-inner">
+                <p className="text-sm text-red-500 font-bold uppercase tracking-wider mb-1">Harga Spesial</p>
+                <p className={`text-3xl md:text-4xl font-black ${theme.textNormal}`}>{config.price}</p>
+              </div>
+            )}
+
             <div className="bg-black/5 p-4 rounded-2xl border border-black/10 text-sm flex items-start gap-3">
               <AlertTriangle className="w-6 h-6 text-yellow-500 shrink-0 mt-0.5" />
               <p className={`leading-relaxed ${theme.textMuted}`}>Simpan di tempat yang sejuk & kering. Jauhkan dari sinar matahari secara langsung. Cuci tangan setelah memakai.</p>
@@ -326,25 +416,20 @@ export default function LandingPage({ config, isLoading }: { config: AppConfig |
               </h3>
               
               <div className="space-y-8">
-                <div className="flex items-center gap-5">
-                  <div className="w-20 h-20 bg-black/5 rounded-2xl flex items-center justify-center border border-black/10 shadow-inner shrink-0">
-                    <Hand className={`w-10 h-10 ${theme.iconColor}`} />
-                  </div>
-                  <div>
-                    <h4 className={`text-lg md:text-xl font-bold mb-1 ${theme.textNormal}`}>Kaos Tangan Plastik</h4>
-                    <p className={`text-sm md:text-base ${theme.textMuted}`}>Keamanan ekstra saat menyebar umpan.</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-5">
-                  <div className="w-20 h-20 bg-black/5 rounded-2xl flex items-center justify-center border border-black/10 shadow-inner shrink-0">
-                    <Box className={`w-10 h-10 ${theme.iconColor}`} />
-                  </div>
-                  <div>
-                    <h4 className={`text-lg md:text-xl font-bold mb-1 ${theme.textNormal}`}>Tempat Umpan</h4>
-                    <p className={`text-sm md:text-base ${theme.textMuted}`}>Wadah khusus agar area tetap bersih.</p>
-                  </div>
-                </div>
+                {bonusItems.map((item, idx) => {
+                  const [title, desc] = item.split('|');
+                  return (
+                    <div key={idx} className="flex items-center gap-5">
+                      <div className="w-20 h-20 bg-black/5 rounded-2xl flex items-center justify-center border border-black/10 shadow-inner shrink-0">
+                        {idx === 0 ? <Hand className={`w-10 h-10 ${theme.iconColor}`} /> : <Box className={`w-10 h-10 ${theme.iconColor}`} />}
+                      </div>
+                      <div>
+                        <h4 className={`text-lg md:text-xl font-bold mb-1 ${theme.textNormal}`}>{title || item}</h4>
+                        {desc && <p className={`text-sm md:text-base ${theme.textMuted}`}>{desc}</p>}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
@@ -430,10 +515,10 @@ export default function LandingPage({ config, isLoading }: { config: AppConfig |
           href={waLink} 
           target="_blank" 
           rel="noopener noreferrer"
-          className="group flex items-center justify-center w-16 h-16 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-[0_0_20px_rgba(34,197,94,0.4)] hover:shadow-[0_0_30px_rgba(34,197,94,0.6)] transition-all transform hover:-translate-y-1"
+          className="group flex items-center justify-center w-20 h-20 rounded-full transition-all transform hover:-translate-y-1"
           aria-label="Pesan via WhatsApp"
         >
-          <MessageCircle className="w-8 h-8 animate-pulse" />
+          <img src="/WhatsApp-Logo.svg" alt="WhatsApp" className="w-[140%] h-[140%] max-w-none animate-pulse drop-shadow-lg object-contain" />
           
           {/* Tooltip */}
           <span className="absolute right-full mr-4 bg-gray-900 text-white text-sm px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-lg border border-gray-800">
